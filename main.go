@@ -5,24 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/andreistefanciprian/prometheus-demo/monitoring"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
-
-var (
-	usersCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "users_served_total",
-			Help: "Total number of users served by the server.",
-		},
-		[]string{"username"},
-	)
-)
-
-func init() {
-	// Register the usersCounter with Prometheus default registry.
-	prometheus.MustRegister(usersCounter)
-}
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
 	// Extracting username from URL
@@ -34,7 +19,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	username := parts[2]
 
 	// Increment the usersCounter for the given username
-	usersCounter.WithLabelValues(username).Inc()
+	monitoring.RecordUserRequest(username)
 
 	// Writing response
 	w.WriteHeader(http.StatusOK)
